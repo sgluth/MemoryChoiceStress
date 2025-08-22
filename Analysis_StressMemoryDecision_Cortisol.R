@@ -1499,7 +1499,7 @@ dev.off()
 
 #drift rate
 png('Figures/DDM_MB_drift',width = 600, height = 700)
-histGran <- (0:150)/150
+histGran <- (0:200)/150
 par(fig=c(0,1,.4,1))
 hist(driftCS,histGran,xlim=c(0,1),ylim=c(0,4000),xaxt='n',yaxt='n',
      col=rgb(1,0,.5,1/2),xlab = '',main = 'Drift slope')
@@ -1549,8 +1549,8 @@ dev.off()
 
 
 ###posterior predictives
-#function for simulation (this is just copy-pasted from below with minor changes; so, rtdists package is used to simulated the DDM)
-sim_ddm_MB  <- function(parameters,vC,vI,mC,mI){
+#function for simulation (this is just copy-pasted from below with minor changes; so, rtdists package is used to simulate the DDM)
+sim_ddm_MB  <- function(parameters,vL,vR,mL,mR){
 
   #extract free parameters; note that order of parameters follows rtdists, not dwiener
   alpha <- parameters[1]
@@ -1560,7 +1560,7 @@ sim_ddm_MB  <- function(parameters,vC,vI,mC,mI){
   memBias <- parameters[5]
 
   #compute trial-wise value difference
-  VD <- delta*(mC*(vC-memBias)-mI*(vI-memBias))
+  VD <- delta*(mL*(vL-memBias)-mR*(vR-memBias))
 
   #Simulate the DDM and store choices and RTs
   nTrials <- length(VD)
@@ -1622,15 +1622,15 @@ for (p in 1:nPostPred){
         mL[mL==FALSE] = TRUE #no forgetting in control decisions
         mR[mR==FALSE] = TRUE #no forgetting in control decisions
       }
-      #recode everything into consistent vs. inconsistent choices
-      correctL <- (vL>vR) #whether left option is better
-      vC <- vL*(correctL==TRUE)+vR*(correctL==FALSE)
-      vI <- vL*(correctL==FALSE)+vR*(correctL==TRUE)
-      mC <- mL*(correctL==TRUE)+mR*(correctL==FALSE)
-      mI <- mL*(correctL==FALSE)+mR*(correctL==TRUE)
 
       #simulate
-      simDat <- sim_ddm_MB(parameters,vC,vI,mC,mI)
+      simDat <- sim_ddm_MB(parameters,vL,vR,mL,mR)
+      
+      #recode into consistent vs. inconsistent choices
+      correctL <- (vL>vR)
+      simDat[,1] = 1+((simDat[,1]==2)&(correctL==TRUE))+((simDat[,1]==1)&(correctL==FALSE))
+      
+      #add it to pp dataset
       if (t==1){
         simDat_M_Stress <- rbind(simDat_M_Stress, simDat)
       } else {
@@ -1666,16 +1666,16 @@ for (p in 1:nPostPred){
       if (t==2){
         mL[mL==FALSE] = TRUE #no forgetting in control decisions
         mR[mR==FALSE] = TRUE #no forgetting in control decisions
-      }      
-      #recode everything into consistent vs. inconsistent choices
-      correctL <- (vL>vR) #whether left option is better
-      vC <- vL*(correctL==TRUE)+vR*(correctL==FALSE)
-      vI <- vL*(correctL==FALSE)+vR*(correctL==TRUE)
-      mC <- mL*(correctL==TRUE)+mR*(correctL==FALSE)
-      mI <- mL*(correctL==FALSE)+mR*(correctL==TRUE)
+      }
       
       #simulate
-      simDat <- sim_ddm_MB(parameters,vC,vI,mC,mI)
+      simDat <- sim_ddm_MB(parameters,vL,vR,mL,mR)
+      
+      #recode into consistent vs. inconsistent choices
+      correctL <- (vL>vR)
+      simDat[,1] = 1+((simDat[,1]==2)&(correctL==TRUE))+((simDat[,1]==1)&(correctL==FALSE))
+      
+      #add it to pp dataset
       if (t==1){
         simDat_M_noStress <- rbind(simDat_M_noStress, simDat)
       } else {
@@ -1692,7 +1692,7 @@ for (p in 1:nPostPred){
   ppDat_M_noStress_choices[,p] = simDat_M_noStress$choices
   ppDat_M_noStress_rts[,p] = simDat_M_noStress$rts
   ppDat_C_noStress_choices[,p] = simDat_C_noStress$choices
-  ppDat_C_noStress_rts[,p] = simDat_C_noStress$rts  
+  ppDat_C_noStress_rts[,p] = simDat_C_noStress$rts 
 
   flush.console()
   msg = sprintf('Done with posterior predictive sample: %d',p)
@@ -1786,7 +1786,7 @@ dC_i_C_N <- mean(cDat2[M2==FALSE]==FALSE)
 dQuants_i_C_N <- quantile(abs(RT2[(M2==FALSE)&(cDat2==FALSE)]),DDMquants)
 
 #plot it (memory-based decisions)
-png(filename = "PosteriorPredictives_QuantilePlot_M.png", width = 800, height = 600)
+png(filename = "Figures/PosteriorPredictives_QuantilePlot_M.png", width = 800, height = 600)
 par(fig = c(0, 0.8, 0, 1), mar = c(5, 6, 4, 4), oma = c(0, 0, 0, 0), xaxs = "i", yaxs = "i")
 
 #draw (thin) lines for the "midpoints" of the HDIs
@@ -1817,9 +1817,9 @@ lines(dQuants_i_M_S, dC_i_M_S * DDMquants, type = 'b', col = "black", lwd = 2, p
 lines(dQuants_c_M_N, dC_c_M_N * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 1)
 lines(dQuants_i_M_N, dC_i_M_N * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 2)
 
-legend("topright", legend = c('Stress/consistent', 'No stress/consistent', 'Stress/consistent', 'No stress/consistent','Data/consistent','Data/inconsistent'),
+legend("topright", legend = c('Stress/consistent', 'No stress/consistent', 'Stress/inconsistent', 'No stress/inconsistent','Data/consistent','Data/inconsistent'),
        col = c("red", "blue", "red", "blue","black","black"),
-       lty = c(1, 1, 2, 2,1,2), lwd = c(4, 4, 4, 4,4,4), bty = 'n', cex = 2)
+       lty = c(1, 1, 2, 2,1,2), lwd = c(4, 4, 4, 4,4,4), bty = 'n', cex = 1.5)
 
 # Add y-axis with upright labels
 axis(1, lwd=3, cex.axis=1.5)
@@ -1829,7 +1829,7 @@ dev.off()
 
 
 #conventional choices
-png(filename = "PosteriorPredictives_QuantilePlot_C.png", width = 800, height = 600)
+png(filename = "Figures/PosteriorPredictives_QuantilePlot_C.png", width = 800, height = 600)
 par(fig = c(0, 0.8, 0, 1), mar = c(5, 6, 4, 4), oma = c(0, 0, 0, 0), xaxs = "i", yaxs = "i")
 
 #draw (thin) lines for the "midpoints" of the HDIs
@@ -1861,9 +1861,9 @@ lines(dQuants_c_C_N, dC_c_C_N * DDMquants, type = 'b', col = "black", lwd = 2, p
 lines(dQuants_i_C_N, dC_i_C_N * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 2)
 
 
-legend("topright", legend = c('Stress/consistent', 'No stress/consistent', 'Stress/consistent', 'No stress/consistent','Data/consistent','Data/inconsistent'),
+legend("topright", legend = c('Stress/consistent', 'No stress/consistent', 'Stress/inconsistent', 'No stress/inconsistent','Data/consistent','Data/inconsistent'),
        col = c("magenta", "cyan", "magenta", "cyan","black","black"),
-       lty = c(1, 1, 2, 2,1,2), lwd = c(4, 4, 4, 4,4,4), bty = 'n', cex = 2)
+       lty = c(1, 1, 2, 2,1,2), lwd = c(4, 4, 4, 4,4,4), bty = 'n', cex = 1.5)
 
 # Add y-axis with upright labels
 axis(1, lwd=3, cex.axis=1.5)
