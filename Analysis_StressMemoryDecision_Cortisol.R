@@ -1812,14 +1812,15 @@ for (q in 1:length(DDMquants)){
 }
 
 #draw the datapoints as black lines
-lines(dQuants_c_M_S, dC_c_M_S * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 1)
-lines(dQuants_i_M_S, dC_i_M_S * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 2)
-lines(dQuants_c_M_N, dC_c_M_N * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 1)
-lines(dQuants_i_M_N, dC_i_M_N * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 2)
+lines(dQuants_c_M_S, dC_c_M_S * DDMquants, type = 'b', col = "red", lwd = 2, pch = 19, lty = 1)
+lines(dQuants_i_M_S, dC_i_M_S * DDMquants, type = 'b', col = "red", lwd = 2, pch = 19, lty = 2)
+lines(dQuants_c_M_N, dC_c_M_N * DDMquants, type = 'b', col = "blue", lwd = 2, pch = 19, lty = 1)
+lines(dQuants_i_M_N, dC_i_M_N * DDMquants, type = 'b', col = "blue", lwd = 2, pch = 19, lty = 2)
 
-legend("topright", legend = c('Stress/consistent', 'No stress/consistent', 'Stress/inconsistent', 'No stress/inconsistent','Data/consistent','Data/inconsistent'),
-       col = c("red", "blue", "red", "blue","black","black"),
-       lty = c(1, 1, 2, 2,1,2), lwd = c(4, 4, 4, 4,4,4), bty = 'n', cex = 1.5)
+legend("topright", legend = c('Model: stress, consistent', 'Model: no stress, consistent', 'Model: stress, inconsistent','Model: no stress, inconsistent',
+                              'Data: stress, consistent', 'Data: no stress, consistent', 'Data: stress, inconsistent','Data: no stress, inconsistent'),
+       col = c("red", "blue", "red", "blue","red","blue"),
+       lty = c(1, 1, 3, 3,1,1,3,3), lwd = c(4, 4, 4, 4,4,4),pch = c(3,3,3,3,19,19,19,19), bty = 'n', cex = 1.25)
 
 # Add y-axis with upright labels
 axis(1, lwd=3, cex.axis=1.5)
@@ -1855,15 +1856,16 @@ for (q in 1:length(DDMquants)){
 }
 
 #draw the datapoints as black lines
-lines(dQuants_c_C_S, dC_c_C_S * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 1)
-lines(dQuants_i_C_S, dC_i_C_S * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 2)
-lines(dQuants_c_C_N, dC_c_C_N * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 1)
-lines(dQuants_i_C_N, dC_i_C_N * DDMquants, type = 'b', col = "black", lwd = 2, pch = 1, lty = 2)
+lines(dQuants_c_C_S, dC_c_C_S * DDMquants, type = 'b', col = "magenta", lwd = 2, pch = 19, lty = 1)
+lines(dQuants_i_C_S, dC_i_C_S * DDMquants, type = 'b', col = "magenta", lwd = 2, pch = 19, lty = 2)
+lines(dQuants_c_C_N, dC_c_C_N * DDMquants, type = 'b', col = "cyan", lwd = 2, pch = 19, lty = 1)
+lines(dQuants_i_C_N, dC_i_C_N * DDMquants, type = 'b', col = "cyan", lwd = 2, pch = 19, lty = 2)
 
 
-legend("topright", legend = c('Stress/consistent', 'No stress/consistent', 'Stress/inconsistent', 'No stress/inconsistent','Data/consistent','Data/inconsistent'),
-       col = c("magenta", "cyan", "magenta", "cyan","black","black"),
-       lty = c(1, 1, 2, 2,1,2), lwd = c(4, 4, 4, 4,4,4), bty = 'n', cex = 1.5)
+legend("topright", legend = c('Model: stress, consistent', 'Model: no stress, consistent', 'Model: stress, inconsistent','Model: no stress, inconsistent',
+                              'Data: stress, consistent', 'Data: no stress, consistent', 'Data: stress, inconsistent','Data: no stress, inconsistent'),
+       col = c("magenta", "cyan", "magenta", "cyan","magenta","cyan"),
+       lty = c(1, 1, 3, 3,1,1,3,3), lwd = c(4, 4, 4, 4,4,4),pch = c(3,3,3,3,19,19,19,19), bty = 'n', cex = 1.25)
 
 # Add y-axis with upright labels
 axis(1, lwd=3, cex.axis=1.5)
